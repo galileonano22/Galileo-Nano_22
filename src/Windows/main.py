@@ -4,15 +4,8 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib.widgets import Button
 from matplotlib import rcParams
-from numpy.random import randint as np
+import atexit
 from openpyxl import Workbook
-from openpyxl.chart import (
-    LineChart,
-    Reference
-)
-from openpyxl.chart.axis import DateAxis
-
-from subprocess import PIPE, Popen
 
 from sx126x import sx126x
 
@@ -20,10 +13,7 @@ from sx126x import sx126x
 def cm_a_inch(valor):
     return valor / 2.54
 
-"""
-process = Popen(['cat', 'sub_datos.py'], stdout=PIPE)
-stdout = process.communicate()
-"""
+
 node = sx126x(serial_num="COM6", freq=433, addr=0, power=22, rssi=True)
 
 # Creamos la figura
@@ -32,6 +22,14 @@ rcParams['toolbar'] = 'None'
 fig = plt.figure(figsize=(cm_a_inch(34), cm_a_inch(17)))
 
 fig.canvas.manager.set_window_title('Galileo Nano 2022')
+
+archivo = open('exportación.txt', 'w')
+archivo.write("")
+archivo.close()
+
+archivo_hora = open('hora.txt', 'w')
+archivo_hora.write("")
+archivo_hora.close()
 
 ax = fig.add_subplot(2, 2, 1)
 bx = fig.add_subplot(2, 2, 2)
@@ -96,84 +94,108 @@ ws3['A1'] = 'LECTURAS'
 ws4['B1'] = 'TIEMPO'
 ws4['A1'] = 'LECTURAS'
 
-
 # Función utilizada por al función de animate
 
-def Animation(i, a, b, c, d):
+a = 0
+b = 0
+temp_aa = ""
+temp_bb = ""
+temp_cc = ""
+temp_dd = ""
+
+archivo = open('exportación.txt', 'a')
+archivo_hora = open('hora.txt', 'a')
+
+def Animation(i, abc, bbc, cbc, dbc, a, b, temp_a, temp_b, temp_c, temp_d, archivo_datos, dato_hora):
     hora = dt.now().strftime("%H:%M:%S")
 
     datos_recibidos = str(node.receive())
     print(datos_recibidos)
-    """
-    #    if datos_recibidos[:3] == 'AAA':
-    temp_a = datos_recibidos[5:11]
-    temp_b = datos_recibidos[13:20]
-    temp_c = datos_recibidos[22:22]
-    temp_d = datos_recibidos[24:25]
-    """
 
+    dato_hora.write(hora + '\n')
+
+    if datos_recibidos[:3] == 'AAA':
+        for z in datos_recibidos:
+
+            a = a + 1
+            if a < 5:
+                continue
+            elif a >= 5:
+                if z == " ":
+                    b = b + 1
+                    continue
+                elif a != " ":
+                    if b == 0:
+                        temp_a = temp_a + str(z)
+                    if b == 1:
+                        temp_b = temp_b + str(z)
+                    if b == 2:
+                        temp_c = temp_c + str(z)
+                    if b == 3:
+                        temp_d = temp_d + str(z)
+                    if b > 3:
+                        break
+
+    archivo_datos.write(temp_a+" "+temp_b+" "+temp_c+" "+temp_d + '\n')
     # TEMPERATURA
-    """
+
     plt.subplot(2, 2, 1)
-    
+
     # Añandiendo los datos
-    if datos_recibidos != None:
-        a.xs.append(hora)
-        a.ys.append(temp_a)
+    abc.xs.append(str(hora))
+    abc.ys.append(temp_a)
     # Redibujar la grafica
     ax.clear()
     # if not paused:
-    ax.plot(a.ys[-400:], )
+    ax.plot(abc.ys[-400:], )
     # Cambiar el formato de la tabla
     plt.title('TEMPERATURA')
+    # plt.axis('off')
 
     # PRESIÓN
 
     plt.subplot(2, 2, 2)
     # Datos random
     # Añandiendo los datos
-    if datos_recibidos != None:
-        b.xs.append(hora)
-        b.ys.append(temp_b)
+    bbc.xs.append(hora)
+    bbc.ys.append(temp_b)
     # Redibujar la grafica
     bx.clear()
     # if not paused:
-    bx.plot(b.ys[-400:], )
+    bx.plot(bbc.ys[-400:], )
     # Cambiar el formato de la tabla
     plt.title('PRESIÓN')
+    # plt.axis('off')
 
     # RADIACIÓN
 
     plt.subplot(2, 2, 3)
     # Datos random
     # Añandiendo los datos
-    if datos_recibidos != None:
-        c.xs.append(hora)
-        c.ys.append(temp_c)
+    cbc.xs.append(hora)
+    cbc.ys.append(temp_c)
     # Redibujar la grafica
     cx.clear()
     # if not paused:
-    cx.plot(c.ys[-400:], )
+    cx.plot(cbc.ys[-400:], )
     # Cambiar el formato de la tabla
     plt.title('RADIACIÓN')
+    # plt.axis('off')
 
     # LUZ
 
     plt.subplot(2, 2, 4)
     # Datos random
     # Añandiendo los datos
-    if datos_recibidos != None:
-        d.xs.append(hora)
-        d.ys.append(temp_d)
+    dbc.xs.append(hora)
+    dbc.ys.append(temp_d)
     # Redibujar la grafica
     dx.clear()
     # if not paused:
-    dx.plot(d.ys[-400:], )
+    dx.plot(dbc.ys[-400:], )
     # Cambiar el formato de la tabla
     plt.title('LUZ')
-
-
-    """
+    # plt.axis('off')
 
 
 def empezar(val):
@@ -234,7 +256,9 @@ bacabar.on_clicked(exportar)
 
 ani = animation.FuncAnimation(fig=fig,
                               func=Animation,
-                              fargs=(tab1, tab2, tab3, tab4),
+                              fargs=(tab1, tab2, tab3, tab4, a, b, temp_aa, temp_bb, temp_cc, temp_dd, archivo, archivo_hora),
                               interval=1250)
 plt.show()
-register(wb.save, 'Datos.xlsx')
+atexit.register(wb.save, 'Datos.xlsx')
+atexit.register(func=archivo.close())
+atexit.register(func=archivo_hora.close())
