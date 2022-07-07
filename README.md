@@ -3,20 +3,22 @@
 [![Twitter](https://img.shields.io/twitter/follow/galileo_nano22?style=social)](https://twitter.com/galileo_nano22) ![lastcommit](https://img.shields.io/github/last-commit/galileonano22/Galileo-Nano_22)
 
 # Galieo Nano
+Todo el proyecto ha sido programado en Python para mayor flexibilidad y eficacia debido al gran número de librerías que facilitan el trabajo y el uso de un lenguaje tan sencillo (comparado con otros sistemas como arduino que usa C + +). Para la ejecución del programa en el raspberry pi zero hemos usado el SO de raspbian lite 32 bits para evitar problemas de compatibilidad. Hemos usado las librerías matplotlib, pyqt5 y openpyxl para la estación de tierra y las librerías estándar de adafruit para la lectura e interpretación del puerto I2C de los sensores.
+
+## Componentes
 
 
-### Libreria para crear archivos excel
+#### Raspberry Pi Zero W
+- https://www.raspberrypi.com/products/raspberry-pi-zero-w/
 
-- https://openpyxl.readthedocs.io/en/stable/
+#### Antena radio
+- https://www.waveshare.com/wiki/SX1268_433M_LoRa_HAT
 
+#### Sensor ultravioleta
+- https://www.adafruit.com/product/4831
 
-### Antena radio
+#### Sensor de temperatura
+- https://www.adafruit.com/product/2651
 
-- https://pypi.org/project/LoRaRF/
-- https://www.waveshare.com/wiki/SX1268_433M_LoRa_HAT#Documents
-
-### Bateria
-
-- https://www.pccomponentes.com/intenso-pm5200-powerbank-5200mah-gris
+#### Batería
 - https://www.pccomponentes.com/energy-sistem-extra-battery-powerbank-2200mah-roja
-- https://www.amazon.es/System-S-Grados-izquierda-acodado-2-0-tipo/dp/B01MYFEGTU/ref=sr_1_27?keywords=micro%2Busb%2Bangulo&sr=8-27&th=1
